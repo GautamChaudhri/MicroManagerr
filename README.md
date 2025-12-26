@@ -32,11 +32,40 @@ MicroManagerr is a self-hosted service that integrates with Sonarr and Radarr to
 
 ### Prerequisites
 
-- Python 3.11+ (for local development)
-- Docker and Docker Compose (recommended for deployment)
+- Docker Desktop installed and running
+- VS Code or Cursor with the "Dev Containers" extension
 - Sonarr and/or Radarr with API access
 
-### Option 1: Run with Docker (Recommended)
+### Option 1: Dev Container (Recommended for Development)
+
+The easiest way to get started is using our dev container, which includes all required tools pre-configured.
+
+```bash
+# Clone the repository
+git clone https://github.com/GautamChaudhri/MicroManagerr.git
+
+# Open in VS Code or Cursor
+code MicroManagerr
+# or: cursor MicroManagerr
+
+# When prompted, click "Reopen in Container"
+# Wait 2-3 minutes for first-time setup
+
+# Once inside the container:
+cd backend
+source ../venv/bin/activate
+uvicorn app.main:app --reload
+
+# Visit http://localhost:8000/docs
+```
+
+**What's included in the dev container:**
+- Python 3.11 with virtual environment
+- FFmpeg, MediaInfo, MKVToolNix
+- All Python dependencies pre-installed
+- VS Code extensions for Python development
+
+### Option 2: Run with Docker Compose (Production/Testing)
 
 ```bash
 # Clone the repository
@@ -139,6 +168,10 @@ Once running, visit these URLs:
 
 ```
 MicroManagerr/
+├── .devcontainer/              # Dev Container configuration
+│   ├── Dockerfile              # Development environment
+│   ├── devcontainer.json       # VS Code/Cursor settings
+│   └── post-create.sh          # Setup script
 ├── backend/                    # Python/FastAPI backend
 │   ├── app/
 │   │   ├── main.py            # Application entry point

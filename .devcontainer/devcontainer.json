@@ -1,0 +1,129 @@
+{
+    "name": "MicroManagerr Dev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+
+    // =========================================================================
+    // Container settings
+    // =========================================================================
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+    // Run as non-root user for security
+    "remoteUser": "vscode",
+
+    // =========================================================================
+    // Features - additional tools installed via dev container features
+    // =========================================================================
+    "features": {
+        // Git with useful defaults
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": false
+        },
+        // GitHub CLI for PR/issue management
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+
+    // =========================================================================
+    // VS Code / Cursor settings
+    // =========================================================================
+    "customizations": {
+        "vscode": {
+            "settings": {
+                // Python settings
+                "python.defaultInterpreterPath": "/workspace/venv/bin/python",
+                "python.terminal.activateEnvironment": true,
+
+                // Formatting with Ruff
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff",
+                    "editor.formatOnSave": true,
+                    "editor.codeActionsOnSave": {
+                        "source.fixAll": "explicit",
+                        "source.organizeImports": "explicit"
+                    }
+                },
+
+                // Editor settings
+                "editor.rulers": [88, 120],
+                "files.trimTrailingWhitespace": true,
+                "files.insertFinalNewline": true,
+
+                // Terminal settings
+                "terminal.integrated.defaultProfile.linux": "bash",
+
+                // Testing
+                "python.testing.pytestEnabled": true,
+                "python.testing.pytestPath": "/workspace/venv/bin/pytest",
+                "python.testing.cwd": "/workspace/backend"
+            },
+            "extensions": [
+                // Python development
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "charliermarsh.ruff",
+
+                // Testing
+                "ms-python.debugpy",
+
+                // Git
+                "eamodio.gitlens",
+                "mhutchie.git-graph",
+
+                // API development
+                "humao.rest-client",
+                "42Crunch.vscode-openapi",
+
+                // Docker
+                "ms-azuretools.vscode-docker",
+
+                // General productivity
+                "streetsidesoftware.code-spell-checker",
+                "usernamehw.errorlens",
+                "gruntfuggly.todo-tree"
+            ]
+        }
+    },
+
+    // =========================================================================
+    // Port forwarding
+    // =========================================================================
+    "forwardPorts": [
+        8000,  // FastAPI server
+        5432   // PostgreSQL (if using docker-compose with DB)
+    ],
+    "portsAttributes": {
+        "8000": {
+            "label": "FastAPI",
+            "onAutoForward": "notify"
+        }
+    },
+
+    // =========================================================================
+    // Lifecycle scripts
+    // =========================================================================
+
+    // Run after container is created (first time only)
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+    // Run every time the container starts
+    "postStartCommand": "echo '✅ Dev container ready! Run: cd backend && source ../venv/bin/activate && uvicorn app.main:app --reload'",
+
+    // =========================================================================
+    // Environment variables
+    // =========================================================================
+    "containerEnv": {
+        "PYTHONPATH": "/workspace/backend"
+    },
+
+    // =========================================================================
+    // Mount points (optional - for testing with local media)
+    // =========================================================================
+    // Uncomment and modify if you want to mount a local media folder for testing:
+    // "mounts": [
+    //     "source=/path/to/your/media,target=/media,type=bind,readonly"
+    // ]
+}

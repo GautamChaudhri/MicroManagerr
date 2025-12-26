@@ -245,12 +245,89 @@ async with httpx.AsyncClient() as client:
 
 ---
 
+## Development Environment: Dev Containers
+
+We use **Dev Containers** to ensure a consistent development environment across all machines.
+
+### What is a Dev Container?
+
+A dev container is a Docker container specifically configured for development. When you open this project in VS Code or Cursor, it automatically:
+1. Builds a Docker container with all required tools
+2. Installs Python, FFmpeg, MediaInfo, MKVToolNix
+3. Sets up your virtual environment
+4. Installs all dependencies
+5. Configures your editor with the right extensions and settings
+
+### Why Dev Containers?
+
+| Benefit | Description |
+|---------|-------------|
+| **Consistency** | Same environment on Mac, Windows, Linux, and your server |
+| **No local pollution** | Everything stays in the container, not on your machine |
+| **Pre-configured tools** | FFmpeg, MediaInfo, MKVToolNix ready to use |
+| **Easy onboarding** | Clone → Open in VS Code → Start coding |
+| **Matches production** | Dev container uses same base as production Docker image |
+
+### Development Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Your Development Workflow                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────────────┐              ┌─────────────────────┐              │
+│   │     Your Mac        │              │    Your Server      │              │
+│   │  ─────────────────  │              │  ─────────────────  │              │
+│   │                     │              │                     │              │
+│   │  VS Code/Cursor     │   git push   │  Docker Container   │              │
+│   │  + Dev Container    │  ─────────>  │  + Media Library    │              │
+│   │                     │              │  + Sonarr/Radarr    │              │
+│   │  - Write code       │              │                     │              │
+│   │  - Test API         │              │  - Integration test │              │
+│   │  - Debug            │              │  - Real media files │              │
+│   │                     │              │                     │              │
+│   └─────────────────────┘              └─────────────────────┘              │
+│                                                                              │
+│   Development & API Testing            Full Integration Testing             │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Getting Started with Dev Containers
+
+**Prerequisites:**
+- Docker Desktop installed and running
+- VS Code or Cursor with "Dev Containers" extension
+
+**Steps:**
+1. Open the project folder in VS Code/Cursor
+2. You'll see a popup: "Reopen in Container" - click it
+   - Or use Command Palette: `Dev Containers: Reopen in Container`
+3. Wait 2-3 minutes for first-time build
+4. Done! Terminal is now inside the container
+
+**First time after container starts:**
+```bash
+cd backend
+source ../venv/bin/activate
+uvicorn app.main:app --reload
+```
+
+Then visit: http://localhost:8000/docs
+
+---
+
 ## Project Structure
 
 Here's what your project directory will look like and what each part does:
 
 ```
 MicroManagerr/
+├── .devcontainer/              # Dev Container configuration
+│   ├── Dockerfile              # Development environment image
+│   ├── devcontainer.json       # VS Code/Cursor dev container settings
+│   └── post-create.sh          # Setup script (runs on first container start)
+│
 ├── .github/                    # GitHub-specific files
 │   └── workflows/              # CI/CD pipelines (later)
 │
@@ -351,34 +428,60 @@ Business logic in `services/` can be tested independently of the API layer.
 
 ## Development Phases
 
-### Phase 0: Environment Setup (Week 1)
+### Phase 0: Environment Setup
 
 **Goals:**
-- [ ] Python environment working
+- [ ] Dev container running in VS Code/Cursor
 - [ ] First FastAPI endpoint running
-- [ ] Docker container building
 - [ ] Can connect to Sonarr/Radarr APIs
+- [ ] Understand the project structure
 
 **What you'll build:**
 A minimal FastAPI app that:
 1. Has a `/health` endpoint
 2. Has a `/api/v1/sonarr/status` endpoint that connects to your Sonarr instance
-3. Runs in Docker
+3. Runs inside your dev container
 
 **Learning focus:**
-- Virtual environments
+- Dev containers and Docker basics
+- Virtual environments (auto-created for you)
 - Package management with pip
 - FastAPI basics
 - Making HTTP requests in Python
-- Docker basics
+
+**Step-by-step guide:**
+
+1. **Start the dev container:**
+   - Open project in VS Code/Cursor
+   - Click "Reopen in Container" when prompted
+   - Wait for build to complete (~2-3 min first time)
+
+2. **Start the FastAPI server:**
+   ```bash
+   cd backend
+   source ../venv/bin/activate
+   uvicorn app.main:app --reload
+   ```
+
+3. **Explore the API:**
+   - Visit http://localhost:8000/docs
+   - Try the `/health` endpoint
+   - Look at the auto-generated documentation
+
+4. **Configure your Arr connection:**
+   - Edit `.env` file in project root
+   - Add your Sonarr/Radarr URL and API key
+   - Restart the server
+   - Try the `/api/v1/sonarr/status` endpoint
 
 **Success criteria:**
 ```bash
-# You should be able to run:
-docker-compose up
+# Inside the dev container, you should be able to:
+curl http://localhost:8000/health
+# Returns: {"status": "healthy", ...}
 
-# And visit http://localhost:8000/docs to see your API
-# And see a successful Sonarr connection
+curl http://localhost:8000/api/v1/sonarr/status
+# Returns: Sonarr connection info (after configuring .env)
 ```
 
 ---
