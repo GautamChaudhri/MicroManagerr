@@ -1,0 +1,52 @@
+# ============================================================================
+# MicroManagerr - Development Dependencies
+# ============================================================================
+# These are tools that help during development but aren't needed in production.
+# Install with: pip install -r requirements-dev.txt
+# ============================================================================
+
+# First, install all production dependencies
+-r requirements.txt
+
+# ----------------------------------------------------------------------------
+# Testing
+# ----------------------------------------------------------------------------
+
+# pytest - Testing framework
+# Why: Industry standard, much better than unittest, great plugins
+pytest~=8.3.0
+
+# pytest-asyncio - Async test support
+# Why: Our FastAPI code is async, tests need to handle that
+pytest-asyncio~=0.24.0
+
+# pytest-cov - Test coverage reporting
+# Why: See which code isn't tested, aim for good coverage
+pytest-cov~=6.0.0
+
+# httpx - Also used for testing FastAPI endpoints
+# (already in main requirements, but worth noting)
+
+# ----------------------------------------------------------------------------
+# Code Quality
+# ----------------------------------------------------------------------------
+
+# ruff - Extremely fast Python linter and formatter
+# Why: Replaces flake8, black, isort - all in one super-fast tool
+ruff~=0.8.0
+
+# mypy - Static type checker
+# Why: Catches bugs before runtime using type hints
+mypy~=1.13.0
+
+# ----------------------------------------------------------------------------
+# Development Tools
+# ----------------------------------------------------------------------------
+
+# ipython - Better interactive Python shell
+# Why: Tab completion, syntax highlighting, debugging
+ipython~=8.29.0
+
+# pre-commit - Git hooks for code quality
+# Why: Automatically run linting before commits
+pre-commit~=4.0.0

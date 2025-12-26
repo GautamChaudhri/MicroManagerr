@@ -1,0 +1,70 @@
+# ============================================================================
+# MicroManagerr - Development Dockerfile
+# ============================================================================
+# This Dockerfile is optimized for development, not production.
+#
+# KEY DIFFERENCES FROM PRODUCTION:
+# 1. Includes dev dependencies (pytest, ruff, etc.)
+# 2. Uses --reload for auto-restart on code changes
+# 3. Runs as root (simpler for development, never do this in prod!)
+# 4. Installs more debugging tools
+#
+# HOW TO USE:
+# docker build -t micromanagerr:dev -f docker/Dockerfile.dev .
+# docker run -p 8000:8000 -v $(pwd)/backend/app:/app/app micromanagerr:dev
+#
+# Or use with docker-compose by changing the dockerfile in docker-compose.yml
+# ============================================================================
+
+FROM python:3.12-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # pip configuration
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    # App settings
+    DEBUG=true \
+    LOG_LEVEL=DEBUG
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Build tools (needed for some Python packages)
+    build-essential \
+    # Useful utilities
+    curl \
+    git \
+    # Media analysis tools (for Phase 2)
+    # ffmpeg \
+    # mediainfo \
+    # mkvtoolnix \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies
+# Copy requirements first to leverage Docker layer caching
+COPY backend/requirements.txt backend/requirements-dev.txt ./
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install -r requirements-dev.txt
+
+# Copy application code
+COPY backend/app ./app
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run with auto-reload for development
+# --reload: Restart when code changes
+# --reload-dir: Which directory to watch
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "app"]

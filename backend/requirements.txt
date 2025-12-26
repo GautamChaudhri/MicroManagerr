@@ -1,0 +1,95 @@
+# ============================================================================
+# MicroManagerr - Python Dependencies
+# ============================================================================
+# This file lists all the external packages your project needs.
+# Install with: pip install -r requirements.txt
+#
+# VERSION PINNING EXPLAINED:
+#   package==1.2.3  -> Exactly this version (most strict)
+#   package>=1.2.3  -> This version or newer (flexible)
+#   package~=1.2.3  -> Compatible release (>=1.2.3, <1.3.0) (balanced)
+#
+# We use ~= for most packages - it allows bug fixes but prevents breaking changes
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Web Framework
+# ----------------------------------------------------------------------------
+
+# FastAPI - Modern, fast web framework for building APIs
+# Why: Automatic docs, type hints, async support, great developer experience
+fastapi~=0.115.0
+
+# Uvicorn - ASGI server that runs FastAPI
+# Why: Fast, production-ready, supports async
+# The [standard] extra includes useful optional dependencies
+uvicorn[standard]~=0.32.0
+
+# ----------------------------------------------------------------------------
+# Database
+# ----------------------------------------------------------------------------
+
+# SQLAlchemy - SQL toolkit and ORM
+# Why: Write Python instead of SQL, database-agnostic, industry standard
+sqlalchemy~=2.0.0
+
+# Alembic - Database migration tool for SQLAlchemy
+# Why: Version control for your database schema, safe upgrades/downgrades
+alembic~=1.14.0
+
+# aiosqlite - Async SQLite driver
+# Why: SQLAlchemy needs this for async SQLite support
+aiosqlite~=0.20.0
+
+# ----------------------------------------------------------------------------
+# Data Validation
+# ----------------------------------------------------------------------------
+
+# Pydantic - Data validation using Python type hints
+# Why: Comes with FastAPI, validates all API input/output automatically
+# pydantic-settings - For loading settings from environment variables
+pydantic~=2.10.0
+pydantic-settings~=2.6.0
+
+# ----------------------------------------------------------------------------
+# HTTP Client
+# ----------------------------------------------------------------------------
+
+# httpx - Modern async HTTP client
+# Why: Async support for calling Sonarr/Radarr APIs, cleaner than requests
+httpx~=0.28.0
+
+# ----------------------------------------------------------------------------
+# Template Rendering (for frontend)
+# ----------------------------------------------------------------------------
+
+# Jinja2 - Template engine
+# Why: Industry standard, used by Flask, works great with FastAPI
+jinja2~=3.1.0
+
+# ----------------------------------------------------------------------------
+# Utilities
+# ----------------------------------------------------------------------------
+
+# python-dotenv - Load environment variables from .env file
+# Why: Keep secrets out of code, different configs for dev/prod
+python-dotenv~=1.0.0
+
+# python-multipart - Required for form data handling in FastAPI
+# Why: File uploads and form submissions need this
+python-multipart~=0.0.12
+
+# ----------------------------------------------------------------------------
+# Future Dependencies (uncomment when needed)
+# ----------------------------------------------------------------------------
+
+# For PostgreSQL support (Phase 6):
+# asyncpg~=0.30.0
+# psycopg2-binary~=2.9.0
+
+# For background tasks (if needed):
+# celery~=5.4.0
+# redis~=5.0.0
+
+# For enhanced logging:
+# structlog~=24.0.0

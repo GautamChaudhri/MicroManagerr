@@ -1,0 +1,21 @@
+MicroManagerr
+
+* Deploy with docker
+* Connect with Sonarr and Radarr
+* Scan all files for HDR data, and then if it finds it, it can suggest an HDR tag
+    * If the user already has an HDR tag, they can tell MicroManagerr which tag and then micro can apply that tag to the relevant movies and shows that have HDR but are not tagged correctly
+* Same thing as HDR but with Dolby Vision, it will also tell you which dovi profile it has and if it has HDR fallback or no. It can then connect to an existing tag and or create a new tag and apply it to movies and shows that are not tagged properly
+* Same thing as HDR and DOVI above but for movies and shows in IMAX profiles or whatever.
+* Same thing as above but for special edition movies or shows. For movies especially, it can maybe do this by checking the current runtime of the movie and then compare it with the runtimes of other versions of the same movie, like Extended Edition or Director’s Cut or whatever, and if it finds a hit, it can make a tag for it or connect to an existing tag and apply it to the relevant movies.
+* Quick-Cropping Letterbox Fix. Plex respects the mkv metadata that can apply a crop tag. I already have a script made that uses various linux tools to scan the show or movie, then if it is detected that it is letterboxed, it can apply the correct crop tags. This avoids transcoding the file again to remove the black bars and is really handy for people who watch on an ultra wide monitor like me. This can be run on a single movie or show, or all movies or shows, or select movies and shows or seasons, etc.
+* For shows and movies that are not in HDR and/or DOVI, MicroManagerr should search the indexers and try to find match that has HDR and or DOVI. 
+    * If it finds a hit and the score of it is higher than what is already downloaded it, it can start the download and then radarr and sonarr should take over from there. 
+    * If it finds a hit but the score is lower than what is currently had, then it keeps track of the hit and lets the user know that it has found a hit with HDR and/or DOVI, and shows them what is missing from this release score wise compared to what is already downloaded. The user can then decide to download it or not. If they choose to download, there should also be an option that marks the movie or show as unmonitored if the user so chooses, and if they do, then micro manager should mark the movie or show as unmonitored after the download is complete and it has been imported. 
+* Notify users if shows and or movies are located in the wrong library. I personally like to split my media up by movies and shows, and then further split up from there with 1080p and 4k folders. Sometimes, I will accidentially set up a new movie to be downlaoded with quality profile 1080p but forget to switch the path and it downlaods it into the 4k library and vice versa. Micro Manager should be able to detect this and then tell the user this fact and offer a suggesstion on the correct place it should be located. if the user allows, it interfaces with sonarr and radarr and changes the path to the correct path and has them move the files where they should be.
+* Track Declutter Module. Automatically analyze files and strip out unwanted audio (e.g., non-preferred languages, commentary tracks if desired) and subtitle tracks to reduce file bloat and clean up the player menu.
+
+
+
+
+
+* (FUTURE / POST-MVP) Hybrid Remux Assembler. Ability to merge the best components from different releases into a single "Frankenstein" file (e.g., Video from Release A + Audio from Release B). This is a complex feature to be addressed after core functionality is stable.

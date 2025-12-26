@@ -1,0 +1,173 @@
+# ============================================================================
+# MicroManagerr - Docker Compose Configuration
+# ============================================================================
+# Docker Compose lets you define and run multi-container applications.
+#
+# WHAT THIS FILE DOES:
+# - Defines the MicroManagerr service
+# - Sets up networking (how containers talk to each other)
+# - Configures volumes (persistent data storage)
+# - Manages environment variables
+#
+# HOW TO USE:
+# Start:      docker-compose up
+# Start (bg): docker-compose up -d
+# Stop:       docker-compose down
+# Logs:       docker-compose logs -f
+# Rebuild:    docker-compose up --build
+#
+# DEVELOPMENT vs PRODUCTION:
+# This file is set up for development. For production, you'd:
+# - Remove the volume mount for code (use COPY in Dockerfile instead)
+# - Use production database (PostgreSQL)
+# - Add proper secrets management
+# - Set DEBUG=false
+# ============================================================================
+
+version: "3.8"
+
+services:
+  # ===========================================================================
+  # MicroManagerr Application
+  # ===========================================================================
+  micromanagerr:
+    # Build from our Dockerfile
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+
+    # Container name (makes logs easier to find)
+    container_name: micromanagerr
+
+    # Restart policy
+    # - "no": Never restart
+    # - "always": Always restart
+    # - "on-failure": Only restart if container exits with error
+    # - "unless-stopped": Restart unless explicitly stopped
+    restart: unless-stopped
+
+    # Port mapping: host:container
+    # Access the app at http://localhost:8000
+    ports:
+      - "8000:8000"
+
+    # Environment variables
+    # These override defaults in config.py
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      # Database - using SQLite for simplicity
+      - DATABASE_URL=sqlite+aiosqlite:///./data/micromanagerr.db
+      # Sonarr/Radarr - use env_file for secrets (see below)
+      # - SONARR_URL=http://sonarr:8989
+      # - SONARR_API_KEY=your_key_here
+
+    # Load environment from file (better for secrets)
+    env_file:
+      - ../.env
+
+    # Volume mounts
+    # Persist data outside the container so it survives restarts
+    volumes:
+      # Database storage - persists your scan data
+      - micromanagerr_data:/app/data
+
+      # DEVELOPMENT ONLY: Mount source code for live reloading
+      # This lets you edit code and see changes without rebuilding
+      # Comment this out in production!
+      - ../backend/app:/app/app:ro
+
+      # Media access - mount your media directories
+      # Uncomment and adjust paths as needed:
+      # - /path/to/movies:/media/movies:ro
+      # - /path/to/tv:/media/tv:ro
+
+    # Health check (also defined in Dockerfile, but can override here)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Networking
+    networks:
+      - micromanagerr_network
+
+    # Resource limits (optional, good for shared servers)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1'
+    #       memory: 512M
+
+  # ===========================================================================
+  # PostgreSQL Database (Optional - for production)
+  # ===========================================================================
+  # Uncomment this section when you're ready to use PostgreSQL
+  #
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: micromanagerr_db
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: micromanagerr
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+  #     POSTGRES_DB: micromanagerr
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - micromanagerr_network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U micromanagerr"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# =============================================================================
+# Networks
+# =============================================================================
+# Networks allow containers to communicate with each other by name.
+# With this network, MicroManagerr could reach PostgreSQL at "postgres:5432"
+networks:
+  micromanagerr_network:
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+# Named volumes persist data outside containers.
+# They survive container rebuilds and restarts.
+volumes:
+  micromanagerr_data:
+    driver: local
+  # postgres_data:
+  #   driver: local
+
+
+# =============================================================================
+# LEARNING NOTES
+# =============================================================================
+#
+# DOCKER NETWORKING:
+# Containers on the same network can reach each other by service name.
+# Example: micromanagerr can connect to postgres at "postgres:5432"
+# External services (Sonarr/Radarr) need their actual IP or hostname.
+#
+# VOLUMES vs BIND MOUNTS:
+# - Volumes: Managed by Docker, stored in Docker's area
+#   volumes:
+#     - myvolume:/app/data
+#
+# - Bind mounts: Direct path on host machine
+#   volumes:
+#     - /path/on/host:/path/in/container
+#
+# Use volumes for database data, bind mounts for config/media access.
+#
+# COMMON COMMANDS:
+# docker-compose ps              # List running containers
+# docker-compose logs -f         # Follow logs
+# docker-compose exec micromanagerr bash  # Shell into container
+# docker-compose down -v         # Stop and remove volumes (careful!)
+# =============================================================================
