@@ -17,10 +17,17 @@
 # ============================================================================
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Find the project root directory (where .env file lives)
+# This file is at: backend/app/config.py
+# Project root is: ../../ (two levels up)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+ENV_FILE_PATH = PROJECT_ROOT / ".env"
 
 
 class Settings(BaseSettings):
@@ -108,8 +115,8 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
 
     model_config = SettingsConfigDict(
-        # Name of the .env file to read
-        env_file=".env",
+        # Path to the .env file (in project root, not backend/)
+        env_file=ENV_FILE_PATH,
 
         # Encoding of the .env file
         env_file_encoding="utf-8",
